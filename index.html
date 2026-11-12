@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<!--
+  Physics Lab: interactive simulations for high school physics (single file, no dependencies).
+  Projectile motion, collisions, the pendulum, inclined planes, circuits and waves, with live readouts, motion graphs,
+  a lab notebook that exports CSV, guided questions, predictions, a teacher answer key, printable worksheets, and shareable setup links. Open it, or host it with GitHub Pages.
+  MIT License, Copyright (c) 2026
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive physics simulations for high school classes: projectile motion, collisions, pendulum, inclined plane, circuits and waves.">
+<meta name="theme-color" content="#2563EB">
+<title>Physics Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232563EB'/%3E%3Cpath d='M12 78Q50 -10 88 78' fill='none' stroke='%23FFFFFF' stroke-width='7' stroke-linecap='round'/%3E%3Ccircle cx='50' cy='34' r='9' fill='%23FFFFFF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1F2937;--blue:#2563EB;--red:#DC2626;--grn:#16A34A;--mute:#6B7280;--bg:#F4F6F9;--line:#E5E7EB;--card:#fff;--bd:#D1D5DB;--hov:#F3F4F6;--sel:#EFF6FF;--acc:#1D4ED8;--blue2:#1D4ED8;--eqt:#1E3A8A;--mute2:#4B5563;color-scheme:light}
+:root[data-theme=dark]{--ink:#E5E7EB;--blue:#3B82F6;--mute:#94A3B8;--bg:#0B1220;--line:#24314D;--card:#111A2E;--bd:#334155;--hov:#1A2540;--sel:#172554;--acc:#93C5FD;--blue2:#2563EB;--eqt:#BFDBFE;--mute2:#94A3B8;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{background:var(--card);border-bottom:1px solid var(--line)}
+header{max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center}.mark{width:40px;height:40px;border-radius:10px;background:var(--blue);display:grid;place-items:center}
+h1{font:650 18px/1.2 Inter,sans-serif;letter-spacing:-.01em}.sub{color:var(--mute);font-size:13px}
+#tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:8px 14px;border-radius:8px;font-weight:500;color:var(--mute2)}.tab:hover{background:var(--hov)}.tab.on{background:var(--sel);color:var(--acc)}
+main{max-width:1240px;margin:0 auto;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+@media(max-width:940px){main{grid-template-columns:1fr}}
+canvas{display:block;width:100%;aspect-ratio:16/10;min-height:330px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px #1018280f}
+#gr{aspect-ratio:16/5;min-height:170px;margin-top:16px}
+.bar{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.go{background:var(--blue);color:#fff;padding:10px 24px;border-radius:8px;font-weight:600;min-width:124px;box-shadow:0 1px 2px #1018281f}.go:hover{background:var(--blue2)}.go:active{transform:translateY(1px)}
+.pill{padding:9px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-weight:500}.pill:hover{background:var(--hov);border-color:#9CA3AF}
+.bar label{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--mute);font-size:14px}
+select{padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 2px #1018280a}
+h2{font:600 15px Inter,sans-serif;margin-bottom:12px}
+.sl{display:grid;grid-template-columns:1fr auto;gap:4px 8px;margin-bottom:14px;align-items:center;font-size:14px}.sl input[type=range]{grid-column:1/3;width:100%;accent-color:var(--blue)}
+.num{display:flex;align-items:center;gap:4px;font-weight:600;color:var(--mute)}.num input{width:84px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;font-size:14px}.row input{width:18px;height:18px;accent-color:var(--blue)}
+dl>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}dl>div:last-child{border:0}
+dt{color:var(--mute)}dd{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.wide{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:940px){.wide{grid-template-columns:1fr}}.wide .panel{margin:0}
+.eq{background:var(--sel);border-left:3px solid var(--blue);color:var(--eqt);padding:10px 14px;border-radius:6px;margin-bottom:12px;font-weight:500;font-size:14px}
+ol{padding-left:20px;margin-top:8px}li{margin-bottom:8px}
+.tw{overflow:auto;max-height:260px;margin-bottom:12px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:right;white-space:nowrap}th{background:var(--hov);font-weight:600;color:var(--mute2)}
+.empty{color:var(--mute)}.acts{display:flex;gap:8px;flex-wrap:wrap}
+#pg{width:120px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card)}.key{margin-top:12px}.key summary{cursor:pointer;font-weight:600;color:var(--acc)}
+#pres{font-size:14px}.pr{display:none}
+.foot{max-width:1240px;margin:0 auto;padding:4px 24px 32px;color:var(--mute);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 18px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none}#toast.on{opacity:1}
+@media print{body{background:var(--card)}.pr{display:block;margin:0 0 14px}.top,.foot,.bar,canvas,aside,#toast,.acts,details{display:none!important}main{display:block;padding:0}.panel{border:0;box-shadow:none;padding:0;margin-bottom:14px}.wide{display:block}li{margin-bottom:54px;break-inside:avoid}.eq{border:1px solid #999;background:var(--card);color:#000}}
+.hb{display:flex;gap:8px}dialog{margin:auto;padding:24px 26px;width:min(560px,92vw);border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);box-shadow:0 20px 50px #0004}dialog::backdrop{background:#0007}dialog h2{margin:6px 0 8px}dialog ul,dialog ol{margin:6px 0 14px 20px;font-size:14px}dialog li{margin-bottom:5px}
+@media print{:root[data-theme]{--ink:#000;--card:#fff;--line:#999;--mute:#444;--bg:#fff}}
+</style>
+</head>
+<body>
+<p class="pr">Name: ______________________ &nbsp; Date: ______________ &nbsp; Simulation: <b id="pname"></b></p>
+<div class="top"><header><div class="brand"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="12" cy="12" r="2.2" fill="#fff"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg></span><div><h1>Physics Lab</h1><p class="sub">Interactive simulations for high school physics</p></div></div><nav id="tabs" aria-label="Simulations"></nav><div class="hb"><button class="pill" id="guide">Guide</button><button class="pill" id="theme">Dark mode</button></div></header></div>
+<main>
+<section><canvas id="cv" aria-label="Simulation"></canvas>
+  <div class="bar"><button class="go" id="run">Run</button><button class="pill" id="rst">Reset</button><button class="pill" id="share">Copy link</button>
+  <label>Speed <select id="spd"><option value=".25">0.25×</option><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div><canvas id="gr" aria-label="Graphs of the motion"></canvas></section>
+<aside><div class="panel"><h2>Controls</h2><div id="ctl"></div></div><div class="panel"><h2>Make a prediction</h2><p id="pq"></p><div class="acts" style="margin-top:8px"><input type="number" id="pg" step="any" aria-label="Your prediction"><button class="pill" id="pchk">Check it</button></div><p id="pres" style="margin-top:8px"></p></div><div class="panel"><h2>Live readout</h2><dl id="out"></dl></div></aside>
+<section class="wide">
+  <div class="panel"><h2>What to notice</h2><p class="eq" id="eq"></p><p id="note"></p><h2 style="margin-top:16px">Try this</h2><ol id="tries"></ol><details class="key"><summary>Teacher answer key</summary><ol id="ans"></ol></details></div>
+  <div class="panel"><h2>Lab notebook</h2><div class="tw"><table id="tbl"></table></div>
+    <div class="acts"><button class="pill" id="rec">Record this setup</button><button class="pill" id="csv">Copy as CSV</button><button class="pill" id="prn">Print worksheet</button><button class="pill" id="clr">Clear</button></div></div>
+</section>
+</main>
+<footer class="foot"><span>Physics Lab: a free, open-source classroom tool (MIT license)</span><span>Press Space to run or pause</span></footer>
+<dialog id="dg"><h2>How to use Physics Lab</h2>
+<ol><li>Pick a simulation from the tabs at the top.</li><li>Type your prediction in “Make a prediction” and press Check it after you run the experiment.</li><li>Change the controls (you can type exact values in the number boxes) and watch the readout and graphs.</li><li>Press “Record this setup” to build a table, then copy it as CSV for your lab report.</li><li>Work through the “Try this” questions.</li></ol>
+<h2>For teachers</h2><ul><li>Set up an experiment and press “Copy link”. Students who open the link get exactly that setup.</li><li>“Print worksheet” makes a handout with the equations, the questions and your recorded data.</li><li>The answer key is under “Try this” on each simulation.</li><li>No accounts and no tracking. Everything runs in the browser.</li></ul>
+<div class="acts"><button class="go" id="dgx" style="min-width:0">Got it</button></div></dialog>
+<div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),G={Earth:9.81,Moon:1.62,Mars:3.71,Venus:8.87,Jupiter:24.79,Saturn:10.44,Pluto:.62,Sun:274},PI=Math.PI;
+const cv=$("#cv"),c=cv.getContext("2d");let INK,BLUE,RED,GRN,GRID,BG,GND,MUTE;
+let W=640,Hh=400,cur="proj",run=false,sp=1,last=0,ro=0,P,rows={proj:[],coll:[],pend:[],incl:[],circ:[],wave:[]};
+const f=(v,d=2)=>(+v).toFixed(d),nice=r=>{const p=10**Math.floor(Math.log10(r)),m=r/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p};
+const line=(x1,y1,x2,y2)=>{c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke()};
+const txt=(s,x,y,al="center",col=INK,font="12px Inter,sans-serif")=>{c.fillStyle=col;c.font=font;c.textAlign=al;c.fillText(s,x,y)};
+function arrow(x,y,dx,dy,col){if(Math.hypot(dx,dy)<3)return;c.strokeStyle=c.fillStyle=col;c.lineWidth=2.5;line(x,y,x+dx,y+dy);const a=Math.atan2(dy,dx);c.beginPath();c.moveTo(x+dx,y+dy);c.lineTo(x+dx-9*Math.cos(a-.4),y+dy-9*Math.sin(a-.4));c.lineTo(x+dx-9*Math.cos(a+.4),y+dy-9*Math.sin(a+.4));c.fill()}
+function path(pts,to,ox,oy,s,col,w,dash,al){c.save();c.globalAlpha=al||1;c.strokeStyle=col;c.lineWidth=w;c.setLineDash(dash||[]);c.beginPath();for(let i=0;i<=to;i+=3){const p=pts[i];i?c.lineTo(ox+p[1]*s,oy-Math.max(0,p[2])*s):c.moveTo(ox+p[1]*s,oy-p[2]*s)}c.stroke();c.restore()}
+const gcv=$("#gr"),gx=gcv.getContext("2d");let GW=640,GH=200;
+function gfit(){const r=gcv.getBoundingClientRect(),d=devicePixelRatio||1;GW=r.width;GH=r.height;gcv.width=GW*d;gcv.height=GH*d;gx.setTransform(d,0,0,d,0,0)}
+function plot(ix,title,xr,yr,ser){const pw=(GW-48)/2,x0=16+ix*(pw+16)+40,y0=28,w=pw-48,h=GH-28-34,sx=v=>x0+(v-xr[0])/((xr[1]-xr[0])||1)*w,sy=v=>y0+h-(v-yr[0])/((yr[1]-yr[0])||1)*h;
+ gx.font="12px Inter,sans-serif";gx.fillStyle=INK;gx.textAlign="left";gx.fillText(title,x0-36,17);
+ const ys=nice((yr[1]-yr[0])/4||1),xs=nice((xr[1]-xr[0])/5||1);gx.strokeStyle=GRID;gx.lineWidth=1;gx.fillStyle=MUTE;gx.textAlign="right";
+ for(let v=Math.ceil(yr[0]/ys)*ys;v<=yr[1]+1e-9;v+=ys){gx.beginPath();gx.moveTo(x0,sy(v));gx.lineTo(x0+w,sy(v));gx.stroke();gx.fillText(+v.toFixed(2),x0-5,sy(v)+4)}
+ gx.textAlign="center";for(let v=Math.ceil(xr[0]/xs)*xs;v<=xr[1]+1e-9;v+=xs){gx.beginPath();gx.moveTo(sx(v),y0);gx.lineTo(sx(v),y0+h);gx.stroke();gx.fillText(+v.toFixed(2),sx(v),y0+h+14)}
+ gx.fillText("time (s)",x0+w/2,y0+h+29);if(yr[0]<0&&yr[1]>0){gx.strokeStyle=INK;gx.lineWidth=1;gx.beginPath();gx.moveTo(x0,sy(0));gx.lineTo(x0+w,sy(0));gx.stroke()}
+ gx.save();gx.beginPath();gx.rect(x0,y0,w,h);gx.clip();ser.forEach(([pts,col])=>{gx.strokeStyle=col;gx.lineWidth=2.5;gx.beginPath();pts.forEach((p,i)=>i?gx.lineTo(sx(p[0]),sy(p[1])):gx.moveTo(sx(p[0]),sy(p[1])));gx.stroke()});gx.restore();
+ gx.strokeStyle=INK;gx.lineWidth=1.5;gx.strokeRect(x0,y0,w,h);gx.textAlign="left";ser.forEach(([,col,l],i)=>{gx.fillStyle=col;gx.fillText(l,x0+8+i*64,y0+15)})}
+const SIM={
+proj:{name:"Projectile motion",d:{v:25,a:45,h:0,g:"Earth",drag:false,m:5,tgt:false,tx:40},
+ ctl:[{k:"v",l:"Launch speed",t:"r",min:5,max:200,step:1,u:" m/s"},{k:"a",l:"Launch angle",t:"r",min:5,max:90,step:1,u:"°"},{k:"h",l:"Launch height",t:"r",min:0,max:500,step:1,u:" m"},{k:"g",l:"World",t:"s"},{k:"drag",l:"Air resistance",t:"c"},{k:"m",l:"Object mass",t:"r",min:.5,max:100,step:.5,u:" kg",show:"drag"},{k:"tgt",l:"Target practice",t:"c"},{k:"tx",l:"Target distance",t:"r",min:5,max:1500,step:1,u:" m",show:"tgt"}],
+ eq:"Flat ground, no air: range R = v²·sin(2θ) / g<br>Peak height H = h₀ + v²·sin²θ / (2g)",
+ note:"Horizontal and vertical motion are independent. Without air resistance the green arrow (horizontal speed) never changes, while the red arrow (vertical speed) shrinks on the way up, is zero at the peak, and grows again on the way down at a steady rate of g. With air resistance on, heavy objects are slowed less than light ones.",
+ tries:["Find the angle that gives the longest range on flat ground. Then launch from a 20 m tower. Is the best angle still 45°?","Compare 30° and 60° at the same speed. What do you notice about their ranges and flight times?","Switch to the Moon and keep everything else the same. How do range and flight time change, and why?","Turn on air resistance and compare a 1 kg object with a 100 kg one launched the same way. Which loses more range, and why?"],
+ ini(){this.hist=[];this.last=null;this.reset()},
+ reset(){const g=G[P.g],th=P.a*PI/180,k=P.drag?.1/P.m:0;let x=0,y=+P.h,vx=P.v*Math.cos(th),vy=P.v*Math.sin(th),t=0,mh=y;const pts=[[0,0,y,vx,vy]],dt=.005;
+  const ux=vx,uy=vy,u0=y;while(t<400){const s=Math.hypot(vx,vy);t+=dt;if(k){vx-=k*s*vx*dt;vy+=(-g-k*s*vy)*dt;x+=vx*dt;y+=vy*dt}else{vy=uy-g*t;x=ux*t;y=u0+uy*t-.5*g*t*t}pts.push([t,x,y,vx,vy]);if(y>mh)mh=y;if(y<0)break}
+  const a=pts[pts.length-2],b=pts[pts.length-1],q=a[2]/((a[2]-b[2])||1);
+  this.R=a[1]+(b[1]-a[1])*q;this.T=a[0]+(b[0]-a[0])*q;this.MH=mh;this.pts=pts;let lo=0,hi=0;pts.forEach(p=>{lo=Math.min(lo,p[3],p[4]);hi=Math.max(hi,p[3],p[4])});this.vlo=lo*1.05-.1;this.vhi=hi*1.05+.1;this.t=0;this.done=false;this.started=false;
+  const vy0=P.v*Math.sin(th);this.R0=P.v*Math.cos(th)*(vy0+Math.sqrt(vy0*vy0+2*g*P.h))/g},
+ restart(){if(this.last)this.hist=[this.last,...this.hist].slice(0,3);this.last=this.pts;this.t=0;this.done=false;this.started=true},
+ step(dt){if(this.done)return;this.t+=dt;if(this.t>=this.T){this.t=this.T;this.done=true;run=false;btn()}},
+ cur(){return this.pts[Math.min(this.pts.length-1,Math.round(this.t/.005))]},
+ out(){const p=this.cur(),r=[["Time",f(p[0])+" s"],["Distance",f(p[1])+" m"],["Height",f(Math.max(0,p[2]))+" m"],["Horizontal speed",f(p[3])+" m/s"],["Vertical speed",f(p[4])+" m/s"],["Speed",f(Math.hypot(p[3],p[4]))+" m/s"],["Range",f(this.R)+" m"],["Peak height",f(this.MH)+" m"],["Flight time",f(this.T)+" s"]];
+  if(P.drag)r.push(["Range without air",f(this.R0)+" m"]);
+  if(P.tgt)r.push(["Target",this.done?(Math.abs(this.R-P.tx)<=1?"Hit!":"Missed by "+f(Math.abs(this.R-P.tx),1)+" m"):"Launch to find out"]);return r},
+ rec(){return{"Speed (m/s)":P.v,"Angle (°)":P.a,"Height (m)":P.h,"g (m/s²)":G[P.g],"Air":P.drag?"yes":"no","Mass (kg)":P.drag?P.m:"n/a","Range (m)":f(this.R),"Peak (m)":f(this.MH),"Time (s)":f(this.T)}},
+ draw(){const ox=56,oy=Hh-34,xm=Math.max(10,this.R*1.08,P.tgt?P.tx*1.1:0,...this.hist.map(h=>h[h.length-1][1]*1.08)),ym=Math.max(5,this.MH*1.15),s=Math.min((W-ox-20)/xm,(oy-20)/ym),gs=nice(70/s);
+  c.fillStyle=BG;c.fillRect(0,0,W,Hh);c.strokeStyle=GRID;c.lineWidth=1;
+  for(let m=0;ox+m*s<W;m+=gs){line(ox+m*s,0,ox+m*s,oy);txt(m,ox+m*s,oy+16)}
+  for(let m=0;oy-m*s>0;m+=gs){line(ox,oy-m*s,W,oy-m*s);txt(m,ox-8,oy-m*s+4,"right")}
+  txt("metres",W-30,oy+30,"right",GRID==="x"?"":MUTE);
+  c.fillStyle=GND;c.fillRect(0,oy,W,Hh-oy);c.strokeStyle=INK;c.lineWidth=2.5;line(0,oy,W,oy);
+  const hy=oy-P.h*s;c.fillStyle=INK;c.fillRect(ox-22,hy,22,oy-hy);c.lineWidth=7;c.lineCap="round";const th=P.a*PI/180;line(ox,hy,ox+Math.cos(th)*24,hy-Math.sin(th)*24);c.lineCap="butt";
+  this.hist.forEach(h=>path(h,h.length-1,ox,oy,s,INK,2,[],.2));
+  path(this.pts,this.pts.length-1,ox,oy,s,BLUE,2,[6,6],.4);
+  const i=Math.min(this.pts.length-1,Math.round(this.t/.005)),p=this.pts[i];path(this.pts,i,ox,oy,s,BLUE,3);
+  if(P.tgt){const X=ox+P.tx*s;c.fillStyle=RED;c.fillRect(X-s,oy-6,2*s,6);c.strokeStyle=INK;c.lineWidth=2;line(X,oy-6,X,oy-34);c.fillStyle="#F59E0B";c.fillRect(X,oy-34,16,11);c.strokeRect(X,oy-34,16,11)}
+  if(this.done){const X=ox+this.R*s;c.strokeStyle=RED;c.lineWidth=3;line(X-6,oy-6,X+6,oy+6);line(X-6,oy+6,X+6,oy-6)}
+  const bx=ox+p[1]*s,by=oy-Math.max(0,p[2])*s;const ak=80/Math.max(P.v,10);arrow(bx,by,p[3]*ak,0,GRN);arrow(bx,by,0,-p[4]*ak,RED);
+  c.fillStyle=RED;c.strokeStyle=INK;c.lineWidth=2;c.beginPath();c.arc(bx,by,7,0,2*PI);c.fill();c.stroke()}},
+coll:{name:"Collisions",d:{m1:2,m2:2,v1:4,v2:0,e:1},
+ ctl:[{k:"m1",l:"Mass of cart 1",t:"r",min:.5,max:100,step:.5,u:" kg"},{k:"v1",l:"Velocity of cart 1",t:"r",min:-20,max:20,step:.5,u:" m/s"},{k:"m2",l:"Mass of cart 2",t:"r",min:.5,max:100,step:.5,u:" kg"},{k:"v2",l:"Velocity of cart 2",t:"r",min:-20,max:20,step:.5,u:" m/s"},{k:"e",l:"Bounciness (0 = sticky, 1 = elastic)",t:"r",min:0,max:1,step:.05,u:""}],
+ eq:"Momentum: p = m·v     Kinetic energy: KE = ½·m·v²<br>Conservation: m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′",
+ note:"Momentum is conserved in every collision. Kinetic energy is only conserved when the collision is perfectly bouncy. When carts stick together, the most kinetic energy turns into heat and sound. Negative velocity means moving left. The bars show the totals before and right after the first hit.",
+ tries:["Use equal masses with cart 2 at rest and bounciness 1. What happens to cart 1?","Make cart 1 much heavier than cart 2. What does cart 2 do?","Set bounciness to 0. Check that momentum before equals momentum after, but kinetic energy does not.","Send the carts at each other with equal momentum (2 kg at 4 m/s and 4 kg at −2 m/s) with bounciness 0. Where do they end up?"],
+ ini(){this.reset()},
+ reset(){this.t=0;this.hs=[];this.m1=+P.m1;this.m2=+P.m2;this.v1=+P.v1;this.v2=+P.v2;this.x1=5;this.x2=17;this.n=0;this.pa=this.ka=null;this.p0=this.m1*this.v1+this.m2*this.v2;this.k0=.5*this.m1*this.v1**2+.5*this.m2*this.v2**2},
+ w(m){return .8+.3*Math.cbrt(m)},
+ step(dt){this.t+=dt;const w1=this.w(this.m1),w2=this.w(this.m2),n=8,d=dt/n;for(let i=0;i<n;i++){this.x1+=this.v1*d;this.x2+=this.v2*d;
+  if(this.x1-w1/2<0){this.x1=w1/2;this.v1=Math.abs(this.v1)}if(this.x2+w2/2>24){this.x2=24-w2/2;this.v2=-Math.abs(this.v2)}
+  if(this.x2-this.x1<(w1+w2)/2&&this.v1>this.v2){const M=this.m1+this.m2,e=+P.e,tp=this.m1*this.v1+this.m2*this.v2,dv=this.v1-this.v2;this.v1=(tp-this.m2*e*dv)/M;this.v2=(tp+this.m1*e*dv)/M;
+   const ov=(w1+w2)/2-(this.x2-this.x1);this.x1-=ov/2;this.x2+=ov/2;if(!this.n){this.pa=this.m1*this.v1+this.m2*this.v2;this.ka=.5*this.m1*this.v1**2+.5*this.m2*this.v2**2}this.n++}}this.hs.push([this.t,this.v1,this.v2,this.m1*this.v1,this.m2*this.v2]);while(this.hs[0][0]<this.t-10)this.hs.shift()},
+ out(){const h=this.pa!==null;return[["Cart 1 velocity",f(this.v1)+" m/s"],["Cart 2 velocity",f(this.v2)+" m/s"],["Momentum before",f(this.p0)+" kg·m/s"],["Momentum after",h?f(this.pa)+" kg·m/s":"waiting"],["Kinetic energy before",f(this.k0)+" J"],["Kinetic energy after",h?f(this.ka)+" J":"waiting"],["Energy lost",h?f(100*(this.k0-this.ka)/(this.k0||1),1)+"%":"waiting"]]},
+ rec(){const h=this.pa!==null;return{"m1 (kg)":this.m1,"v1 (m/s)":P.v1,"m2 (kg)":this.m2,"v2 (m/s)":P.v2,"Bounciness":P.e,"p before":f(this.p0),"p after":h?f(this.pa):"",["KE before (J)"]:f(this.k0),"KE after (J)":h?f(this.ka):""}},
+ draw(){const s=(W-60)/24,ox=30,ty=Hh-70;c.fillStyle=BG;c.fillRect(0,0,W,Hh);c.strokeStyle=GRID;c.lineWidth=1;
+  for(let m=0;m<=24;m+=2){line(ox+m*s,150,ox+m*s,ty);txt(m,ox+m*s,ty+34)}
+  c.strokeStyle=INK;c.lineWidth=3;line(ox,ty,ox+24*s,ty);line(ox,ty-60,ox,ty);line(ox+24*s,ty-60,ox+24*s,ty);txt("metres",W-20,ty+52,"right",MUTE);
+  const cart=(x,m,v,col)=>{const w=this.w(m)*s,h=Math.min(64,22+m*3),X=ox+x*s-w/2;c.fillStyle=col;c.strokeStyle=INK;c.lineWidth=2;c.beginPath();c.roundRect(X,ty-h-8,w,h,5);c.fill();c.stroke();
+   c.fillStyle="#fff";[.25,.75].forEach(q=>{c.beginPath();c.arc(X+w*q,ty-5,6,0,2*PI);c.fill();c.stroke()});txt(m+" kg",X+w/2,ty-h/2-4,"center","#fff","600 13px Inter,sans-serif");arrow(ox+x*s,ty-h-24,v*10,0,col==BLUE?BLUE:RED)};
+  cart(this.x1,this.m1,this.v1,BLUE);cart(this.x2,this.m2,this.v2,RED);
+  const pm=Math.max(Math.abs(this.p0),Math.abs(this.pa||0),1e-9),km=Math.max(this.k0,1e-9);
+  [["Momentum before",30,Math.abs(this.p0)/pm,this.p0,BLUE],["Momentum after",100,this.pa===null?0:Math.abs(this.pa)/pm,this.pa,BLUE],["KE before",210,this.k0/km,this.k0,RED],["KE after",280,this.ka===null?0:this.ka/km,this.ka,RED]].forEach(([l,x,r,val,col])=>{
+   c.fillStyle=col;c.fillRect(x,100-r*70,46,r*70);c.strokeStyle=INK;c.lineWidth=1.5;c.strokeRect(x,30,46,70);txt(val===null?"–":f(val,1),x+23,24);txt(l.split(" ")[0]==="Momentum"?l.replace("Momentum","p"):l,x+23,118)})}},
+pend:{name:"Pendulum",d:{L:1.5,a:30,m:.5,g:"Earth",damp:false},
+ ctl:[{k:"L",l:"String length",t:"r",min:.1,max:10,step:.1,u:" m"},{k:"a",l:"Starting angle",t:"r",min:5,max:85,step:1,u:"°"},{k:"m",l:"Mass",t:"r",min:.1,max:50,step:.1,u:" kg"},{k:"g",l:"World",t:"s"},{k:"damp",l:"Friction",t:"c"}],
+ eq:"Period (small swings): T = 2π·√(L / g)<br>Energy: PE = m·g·h, KE = ½·m·v²",
+ note:"The period depends on the length and on g, but not on the mass. Total energy stays constant while it swaps between potential energy (blue) and kinetic energy (red). Friction slowly drains it. For large angles the real period is a little longer than the small-angle formula.",
+ tries:["Double the length. How does the period change? Is it double?","Change the mass from 0.1 kg to 2 kg. What happens to the period?","Raise the starting angle to 80°. Compare the measured period with the small-angle prediction.","Take the pendulum to Jupiter. How would you change the length to get the same period as on Earth?"],
+ ini(){this.reset()},
+ reset(){this.th=P.a*PI/180;this.w=0;this.t=0;this.pth=this.th;this.cr=[];this.Tm=null;this.buf=[];this.acc=0},
+ step(dt){const g=G[P.g],L=+P.L,cf=P.damp?.25:0,n=Math.ceil(dt/.002),d=dt/n;
+  for(let i=0;i<n;i++){this.w+=(-g/L*Math.sin(this.th)-cf*this.w)*d;this.th+=this.w*d;this.t+=d;
+   if(this.pth<0&&this.th>=0){this.cr.push(this.t);if(this.cr.length>1)this.Tm=this.cr[this.cr.length-1]-this.cr[this.cr.length-2]}this.pth=this.th}
+  this.acc+=dt;if(this.acc>.016){this.acc=0;this.buf.push([this.t,this.th,this.w]);while(this.t-this.buf[0][0]>8)this.buf.shift()}},
+ E(){const g=G[P.g],L=+P.L,m=+P.m,ke=.5*m*(L*this.w)**2,pe=m*g*L*(1-Math.cos(this.th));return[ke,pe,m*g*L*(1-Math.cos(P.a*PI/180))]},
+ T0(){return 2*PI*Math.sqrt(P.L/G[P.g])},
+ out(){const[ke,pe]=this.E(),a=P.a*PI/180,T0=this.T0();return[["Time",f(this.t)+" s"],["Angle",f(this.th*180/PI,1)+"°"],["Speed of bob",f(Math.abs(P.L*this.w))+" m/s"],["Kinetic energy",f(ke,3)+" J"],["Potential energy",f(pe,3)+" J"],["Total energy",f(ke+pe,3)+" J"],["Measured period",this.Tm?f(this.Tm,3)+" s":"measuring"],["Small-angle formula",f(T0,3)+" s"],["Corrected for your angle",f(T0*(1+a*a/16),3)+" s"]]},
+ rec(){const a=P.a*PI/180,T0=this.T0();return{"Length (m)":P.L,"Angle (°)":P.a,"Mass (kg)":P.m,"g (m/s²)":G[P.g],"Friction":P.damp?"yes":"no","Measured T (s)":this.Tm?f(this.Tm,3):"","Formula T (s)":f(T0,3),"Corrected T (s)":f(T0*(1+a*a/16),3)}},
+ draw(){c.fillStyle=BG;c.fillRect(0,0,W,Hh);const L=+P.L,s=Math.max(14,(Hh-200)/Math.max(3,L)),px=W*.42,py=34,bx=px+L*s*Math.sin(this.th),by=py+L*s*Math.cos(this.th),a=P.a*PI/180;
+  c.strokeStyle=GRID;c.lineWidth=1;const gl=L>5?2:L>2?1:.5;for(let m=0;m<=Math.max(3,L);m+=gl){line(px-130,py+m*s,px+130,py+m*s);if(m%1===0)txt(m+" m",px-136,py+m*s+4,"right")}
+  c.setLineDash([5,5]);c.strokeStyle="#9CA3AF";[-a,a].forEach(q=>line(px,py,px+L*s*Math.sin(q),py+L*s*Math.cos(q)));c.setLineDash([]);
+  c.strokeStyle=INK;c.lineWidth=5;line(px-60,py-4,px+60,py-4);c.lineWidth=2.5;line(px,py,bx,by);
+  c.fillStyle=BLUE;c.beginPath();c.arc(bx,by,8+7*Math.cbrt(P.m),0,2*PI);c.fill();c.lineWidth=2;c.stroke();
+  const[ke,pe,E0]=this.E(),bh=120,X=W-90,Y=30;c.strokeStyle=INK;c.lineWidth=2;c.strokeRect(X,Y,40,bh);const ph=Math.min(bh,pe/E0*bh),kh=Math.min(bh-ph,ke/E0*bh);
+  c.fillStyle=BLUE;c.fillRect(X,Y+bh-ph,40,ph);c.fillStyle=RED;c.fillRect(X,Y+bh-ph-kh,40,kh);txt("Energy",X+20,Y-8);txt("PE",X-14,Y+bh-4,"right",BLUE);txt("KE",X-14,Y+16,"right",RED);
+  const cy=Hh-48,cw=W-80,cx=40;c.strokeStyle=GRID;c.lineWidth=1;line(cx,cy,cx+cw,cy);txt("θ over the last 8 seconds",cx,cy-44,"left",MUTE);
+  const ws=Math.max(0,this.t-8);c.strokeStyle=RED;c.lineWidth=2;c.beginPath();this.buf.forEach(([t,th],i)=>{const X2=cx+(t-ws)/8*cw,Y2=cy-th/a*30;i?c.lineTo(X2,Y2):c.moveTo(X2,Y2)});c.stroke()}},
+incl:{name:"Inclined plane",d:{a:25,m:5,mu:.3,g:"Earth"},
+ ctl:[{k:"a",l:"Slope angle",t:"r",min:0,max:85,step:1,u:"°"},{k:"m",l:"Mass of block",t:"r",min:1,max:500,step:1,u:" kg"},{k:"mu",l:"Friction coefficient μ",t:"r",min:0,max:1.5,step:.05,u:""},{k:"g",l:"World",t:"s"}],
+ eq:"Along the slope: F = m·g·sinθ − μ·m·g·cosθ<br>Pressing into the slope: N = m·g·cosθ",
+ note:"The weight splits into a part pulling the block down the slope and a part pressing into it. Friction is μ times the normal force, so every term contains m and the acceleration a = g(sinθ − μ·cosθ) doesn’t depend on the mass. The block only slides once tanθ is bigger than μ.",
+ tries:["Raise the angle until the block just starts to slide. Does it match the “Starts sliding above” value?","Change the mass. Does the acceleration change? Explain why using the equation.","Set μ to 0 and compare the acceleration with g·sinθ.","Go to the Moon. Which forces change and which stay the same?"],
+ ini(){this.reset()},reset(){this.s=0;this.v=0;this.t=0;this.hs=[];this.done=false;this.started=false},restart(){this.reset();this.started=true},
+ slides(){return Math.tan(P.a*PI/180)>P.mu},
+ acc(){const th=P.a*PI/180;return this.slides()?G[P.g]*(Math.sin(th)-P.mu*Math.cos(th)):0},
+ F(){const th=P.a*PI/180,w=P.m*G[P.g],N=w*Math.cos(th),par=w*Math.sin(th),sl=this.slides(),fr=sl?P.mu*N:par;return{w,N,par,fr,net:par-fr,sl}},
+ step(dt){if(this.done)return;this.t+=dt;this.v+=this.acc()*dt;this.s+=this.v*dt;this.hs.push([this.t,Math.min(7,this.s),this.v]);if(this.s>=7){this.s=7;this.done=true;run=false;btn()}},
+ out(){const q=this.F();return[["Weight (m·g)",f(q.w,1)+" N"],["Normal force",f(q.N,1)+" N"],["Pull along slope",f(q.par,1)+" N"],["Friction",f(q.fr,1)+" N"],["Net force",f(q.net,1)+" N"],["Acceleration",f(this.acc())+" m/s²"],["Speed",f(this.v)+" m/s"],["Distance slid",f(this.s)+" m"],["Starts sliding above",f(Math.atan(P.mu)*180/PI,1)+"°"],["Status",q.sl?"Slides":"Stays put"]]},
+ rec(){const q=this.F();return{"Mass (kg)":P.m,"Angle (°)":P.a,"μ":P.mu,"g (m/s²)":G[P.g],"Net force (N)":f(q.net,1),"a (m/s²)":f(this.acc()),"Slides":q.sl?"yes":"no"}},
+ draw(){c.fillStyle=BG;c.fillRect(0,0,W,Hh);const th=P.a*PI/180,co=Math.cos(th),si=Math.sin(th),s=Math.min((W-140)/8,(Hh-130)/(8*si+1.5)),Bx=W-60,By=Hh-44,Tx=Bx-8*co*s,Ty=By-8*si*s,q=this.F();
+  c.strokeStyle=INK;c.lineWidth=2.5;line(0,By,W,By);c.fillStyle=GND;c.beginPath();c.moveTo(Tx,Ty);c.lineTo(Bx,By);c.lineTo(Tx,By);c.closePath();c.fill();c.stroke();
+  c.strokeStyle=INK;c.lineWidth=1.5;c.beginPath();c.arc(Bx,By,48,PI,PI+th);c.stroke();txt(P.a+"°",Bx-70,By-8);
+  const d=.7+this.s,Cx=Tx+d*co*s,Cy=Ty+d*si*s,b=38;c.save();c.translate(Cx,Cy);c.rotate(th);c.fillStyle=BLUE;c.fillRect(-b/2,-b,b,b);c.lineWidth=2;c.strokeRect(-b/2,-b,b,b);c.restore();
+  const cx=Cx+si*b/2,cy=Cy-co*b/2,k=90/q.w;arrow(cx,cy,0,q.w*k,INK);arrow(cx,cy,si*q.N*k,-co*q.N*k,BLUE);if(q.fr>.05)arrow(cx,cy,-co*q.fr*k,-si*q.fr*k,RED);
+  txt(P.m+" kg",cx,cy+4,"center","#fff","600 12px Inter,sans-serif");
+  [["Weight",INK],["Normal force",BLUE],["Friction",RED]].forEach(([l,col],i)=>{c.fillStyle=col;c.fillRect(16,18+i*20,14,4);txt(l,38,24+i*20,"left")})}},
+circ:{name:"Circuits",d:{V:9,R1:20,R2:30,par:false},
+ ctl:[{k:"V",l:"Battery voltage",t:"r",min:1.5,max:120,step:.5,u:" V"},{k:"R1",l:"Resistor 1",t:"r",min:1,max:1000,step:1,u:" Ω"},{k:"R2",l:"Resistor 2",t:"r",min:1,max:1000,step:1,u:" Ω"},{k:"par",l:"Wire them in parallel",t:"c"}],
+ eq:"Ohm’s law: V = I·R     Power: P = I·V<br>Series: Rₜ = R₁ + R₂     Parallel: 1/Rₜ = 1/R₁ + 1/R₂",
+ note:"In a series circuit the same current flows through every part and the battery voltage is shared out. In a parallel circuit every branch gets the full battery voltage and the current is shared out. The moving dots show current: faster dots mean more amps.",
+ tries:["Build a series circuit and double R1. What happens to the total current and to each voltage?","Switch to parallel. Which branch carries more current, the bigger or the smaller resistor? Why?","Compare the total resistance in series and in parallel with the same two resistors. Why is the parallel total smaller than either one?","Double the battery voltage. What happens to the total power?"],
+ ini(){this.reset()},reset(){this.t=0},step(dt){this.t+=dt},
+ q(){const V=+P.V,a=+P.R1,b=+P.R2;if(P.par){const Rt=a*b/(a+b),I=V/Rt;return{Rt,I,I1:V/a,I2:V/b,V1:V,V2:V}}const Rt=a+b,I=V/Rt;return{Rt,I,I1:I,I2:I,V1:I*a,V2:I*b}},
+ out(){const q=this.q();return[["Total resistance",f(q.Rt,1)+" Ω"],["Total current",f(q.I*1000,0)+" mA"],["R1 voltage",f(q.V1)+" V"],["R1 current",f(q.I1*1000,0)+" mA"],["R1 power",f(q.V1*q.I1)+" W"],["R2 voltage",f(q.V2)+" V"],["R2 current",f(q.I2*1000,0)+" mA"],["R2 power",f(q.V2*q.I2)+" W"],["Total power",f(P.V*q.I)+" W"]]},
+ rec(){const q=this.q();return{"V (volts)":P.V,"R1 (Ω)":P.R1,"R2 (Ω)":P.R2,"Wiring":P.par?"parallel":"series","Total R (Ω)":f(q.Rt,1),"Total I (A)":f(q.I,3),"Total P (W)":f(P.V*q.I)}},
+ draw(){c.fillStyle=BG;c.fillRect(0,0,W,Hh);const q=this.q(),T=100,B=Hh-100,L=90,par=P.par,x1=par?W*.5:W*.38,x2=par?W*.78:W*.66,R=par?x2:W-90,mid=Hh/2;
+  const wire=p=>{c.beginPath();p.forEach((v,i)=>i?c.lineTo(v[0],v[1]):c.moveTo(v[0],v[1]));c.stroke()};
+  c.strokeStyle=INK;c.lineWidth=3;wire([[L,mid-14],[L,T],[R,T],[R,B],[L,B],[L,mid+14]]);if(par)wire([[x1,T],[x1,B]]);
+  c.lineWidth=4;line(L-26,mid-14,L+26,mid-14);c.lineWidth=7;line(L-13,mid+14,L+13,mid+14);txt("+",L+40,mid-8,"left",INK,"700 18px sans-serif");txt(P.V+" V",L-36,mid+6,"right",INK,"600 15px Inter,sans-serif");
+  const loops=par?[[[[L,T],[x1,T],[x1,B],[L,B],[L,T]],q.I1],[[[L,T],[x2,T],[x2,B],[L,B],[L,T]],q.I2]]:[[[[L,T],[R,T],[R,B],[L,B],[L,T]],q.I]];
+  c.fillStyle=BLUE;loops.forEach(([pts,I])=>{const segs=[];let per=0;for(let i=0;i<4;i++){const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);segs.push(l);per+=l}
+   const n=Math.round(per/24),spd=Math.min(500,I*400);for(let j=0;j<n;j++){let d=(j*per/n+this.t*spd)%per,i=0;while(d>segs[i]){d-=segs[i];i++}const u=d/segs[i];c.beginPath();c.arc(pts[i][0]+(pts[i+1][0]-pts[i][0])*u,pts[i][1]+(pts[i+1][1]-pts[i][1])*u,4,0,2*PI);c.fill()}});
+  const box=(x,y,w,hh,l1,l2)=>{c.fillStyle=BG;c.strokeStyle=INK;c.lineWidth=3;c.fillRect(x-w/2,y-hh/2,w,hh);c.strokeRect(x-w/2,y-hh/2,w,hh);txt(l1,x,y+4,"center",INK,"600 13px Inter,sans-serif");txt(l2,x,y+hh/2+18,"center",RED,"600 13px Inter,sans-serif")};
+  if(par){box(x1,mid,70,34,"R1 "+P.R1+" Ω","");box(x2,mid,70,34,"R2 "+P.R2+" Ω","");txt(f(q.V1)+" V",x1,mid+36,"center",RED,"600 13px Inter,sans-serif");txt(f(q.V2)+" V",x2,mid+36,"center",RED,"600 13px Inter,sans-serif")}
+  else{box(x1,T,76,34,"R1 "+P.R1+" Ω",f(q.V1)+" V");box(x2,T,76,34,"R2 "+P.R2+" Ω",f(q.V2)+" V")}}}
+};
+SIM.proj.graph=function(){const i=Math.min(this.pts.length-1,Math.round(this.t/.005)),a=[],b=[],d=[];for(let j=0;j<=i;j+=6){const p=this.pts[j];a.push([p[0],p[2]]);b.push([p[0],p[3]]);d.push([p[0],p[4]])}
+ plot(0,"Height y (m)",[0,this.T],[0,Math.max(1,this.MH*1.05)],[[a,BLUE,"y"]]);plot(1,"Velocity (m/s)",[0,this.T],[this.vlo,this.vhi],[[b,GRN,"vx"],[d,RED,"vy"]])};
+SIM.incl.graph=function(){const a=this.acc(),tt=Math.max(1,a>0?Math.sqrt(14/a):4);plot(0,"Distance slid (m)",[0,tt],[0,7.3],[[this.hs.map(p=>[p[0],p[1]]),BLUE,"s"]]);plot(1,"Speed (m/s)",[0,tt],[0,Math.max(1,a*tt*1.05)],[[this.hs.map(p=>[p[0],p[2]]),RED,"v"]])};
+SIM.coll.graph=function(){const h=this.hs,x=[Math.max(0,this.t-10),Math.max(10,this.t)],mv=Math.max(1,...h.map(p=>Math.max(Math.abs(p[1]),Math.abs(p[2]))))*1.15,mp=Math.max(1,...h.map(p=>Math.max(Math.abs(p[3]),Math.abs(p[4]),Math.abs(p[3]+p[4]))))*1.15;
+ plot(0,"Velocity (m/s)",x,[-mv,mv],[[h.map(p=>[p[0],p[1]]),BLUE,"cart 1"],[h.map(p=>[p[0],p[2]]),RED,"cart 2"]]);plot(1,"Momentum (kg·m/s)",x,[-mp,mp],[[h.map(p=>[p[0],p[3]]),BLUE,"cart 1"],[h.map(p=>[p[0],p[4]]),RED,"cart 2"],[h.map(p=>[p[0],p[3]+p[4]]),INK,"total"]])};
+SIM.pend.graph=function(){const b=this.buf,x=[Math.max(0,this.t-8),Math.max(8,this.t)],g0=G[P.g],L=+P.L,m=+P.m,am=P.a*1.15,E0=m*g0*L*(1-Math.cos(P.a*PI/180))*1.1||1,pe=p=>m*g0*L*(1-Math.cos(p[1])),ke=p=>.5*m*(L*p[2])**2;
+ plot(0,"Angle (°)",x,[-am,am],[[b.map(p=>[p[0],p[1]*180/PI]),BLUE,"θ"]]);plot(1,"Energy (J)",x,[0,E0],[[b.map(p=>[p[0],pe(p)]),BLUE,"PE"],[b.map(p=>[p[0],ke(p)]),RED,"KE"],[b.map(p=>[p[0],pe(p)+ke(p)]),INK,"total"]])};
+SIM.wave={name:"Waves",d:{v:4,f:.5,A:.8,two:false,f2:.6,A2:.8},
+ ctl:[{k:"v",l:"Wave speed",t:"r",min:.5,max:20,step:.5,u:" m/s"},{k:"f",l:"Frequency",t:"r",min:.1,max:4,step:.05,u:" Hz"},{k:"A",l:"Amplitude",t:"r",min:.1,max:2,step:.05,u:" m"},{k:"two",l:"Add a second wave",t:"c"},{k:"f2",l:"Second wave frequency",t:"r",min:.1,max:4,step:.05,u:" Hz",show:"two"},{k:"A2",l:"Second wave amplitude",t:"r",min:.1,max:2,step:.05,u:" m",show:"two"}],
+ eq:"Wave speed: v = f·λ     Period: T = 1/f<br>Displacement: y = A·sin(2π·f·(x/v − t))     Beats: f_beat = |f₁ − f₂|",
+ note:"A wave carries energy without carrying the medium along. The speed is set by the medium, so a higher frequency means a shorter wavelength. When two waves overlap, their displacements simply add (superposition): the black curve is the sum. Waves with slightly different frequencies make beats, which you can see in the probe graph.",
+ tries:["Increase the frequency without changing the speed. What happens to the wavelength?","Change only the wave speed. Which changes: the wavelength or the frequency?","Add a second wave with the same frequency and amplitude. What happens to the total amplitude?","Set the second frequency slightly different from the first and watch the probe graph. How often does the loud-quiet pattern repeat?"],
+ ini(){this.reset()},reset(){this.t=0;this.hs=[]},
+ w1(x){return P.A*Math.sin(2*PI*P.f*(x/P.v-this.t))},w2(x){return P.two?P.A2*Math.sin(2*PI*P.f2*(x/P.v-this.t)):0},
+ step(dt){this.t+=dt;this.hs.push([this.t,this.w1(5),this.w2(5)]);while(this.hs[0][0]<this.t-9)this.hs.shift()},
+ out(){const r=[["Time",f(this.t)+" s"],["Wavelength λ = v/f",f(P.v/P.f)+" m"],["Period T = 1/f",f(1/P.f)+" s"],["Displacement at probe",f(this.w1(5)+this.w2(5))+" m"]];
+  if(P.two)r.push(["Second wavelength",f(P.v/P.f2)+" m"],["Beat frequency",f(Math.abs(P.f-P.f2),2)+" Hz"],["Largest possible total",f(+P.A+ +P.A2)+" m"]);return r},
+ rec(){return{"Speed (m/s)":P.v,"f (Hz)":P.f,"A (m)":P.A,"Second wave":P.two?"yes":"no","λ (m)":f(P.v/P.f),"T (s)":f(1/P.f),"Beat f (Hz)":P.two?f(Math.abs(P.f-P.f2),2):""}},
+ draw(){c.fillStyle=BG;c.fillRect(0,0,W,Hh);const ox=40,s=(W-80)/10,my=Hh/2-8,mA=+P.A+(P.two?+P.A2:0),ys=(my-30)/mA,lam=P.v/P.f,as=nice(mA/3);
+  c.strokeStyle=GRID;c.lineWidth=1;for(let a=-Math.floor(mA/as)*as;a<=mA+1e-9;a+=as){line(ox,my-a*ys,W-40,my-a*ys);txt(+a.toFixed(2),ox-6,my-a*ys+4,"right")}
+  for(let m=0;m<=10;m++){line(ox+m*s,my-mA*ys,ox+m*s,my+mA*ys);txt(m,ox+m*s,my+mA*ys+16)}txt("position (m)",W-40,my+mA*ys+32,"right",MUTE);
+  const pl=(fn,col,w,al)=>{c.save();c.globalAlpha=al;c.strokeStyle=col;c.lineWidth=w;c.beginPath();for(let px=0;px<=10*s;px+=2){const y=my-fn(px/s)*ys;px?c.lineTo(ox+px,y):c.moveTo(ox,y)}c.stroke();c.restore()};
+  if(P.two){pl(x=>this.w1(x),BLUE,2,.55);pl(x=>this.w2(x),RED,2,.55)}pl(x=>this.w1(x)+this.w2(x),INK,3.5,1);
+  const X=ox+5*s,yp=my-(this.w1(5)+this.w2(5))*ys;c.setLineDash([5,5]);c.strokeStyle=RED;c.lineWidth=2;line(X,my-mA*ys,X,my+mA*ys);c.setLineDash([]);c.fillStyle=RED;c.beginPath();c.arc(X,yp,7,0,2*PI);c.fill();txt("probe",X,my-mA*ys-8,"center",RED);
+  if(lam<10){const y=Hh-18;c.strokeStyle=BLUE;c.lineWidth=2;line(ox,y,ox+lam*s,y);line(ox,y-5,ox,y+5);line(ox+lam*s,y-5,ox+lam*s,y+5);txt("one wavelength = "+f(lam)+" m",ox+lam*s+10,y+4,"left",BLUE)}}};
+SIM.wave.graph=function(){const h=this.hs,x=[Math.max(0,this.t-8),Math.max(8,this.t)],m=(+P.A+(P.two?+P.A2:0))*1.15,ser=[[h.map(p=>[p[0],p[1]]),BLUE,"wave 1"]];if(P.two)ser.push([h.map(p=>[p[0],p[2]]),RED,"wave 2"]);
+ plot(0,"Total displacement at the probe (m)",x,[-m,m],[[h.map(p=>[p[0],p[1]+p[2]]),INK,"sum"]]);plot(1,"Each wave at the probe (m)",x,[-m,m],ser)};
+SIM.proj.pred=["Predict the range (m)",function(){return this.R}];
+SIM.coll.pred=["Predict cart 1’s velocity right after the hit (m/s)",function(){const a=+P.m1,b=+P.m2,u=+P.v1,v=+P.v2,e=+P.e;return(a*u+b*v-b*e*(u-v))/(a+b)}];
+SIM.pend.pred=["Predict the period (s)",function(){const a=P.a*PI/180;return this.T0()*(1+a*a/16)}];
+SIM.incl.pred=["Predict the acceleration (m/s²)",function(){return this.acc()}];
+SIM.circ.pred=["Predict the total current (mA)",function(){return this.q().I*1000}];
+SIM.wave.pred=["Predict the wavelength (m)",function(){return P.v/P.f}];
+SIM.proj.ans=["About 45° on flat ground. From a tower the best angle is lower: roughly 38° for 25 m/s launched from 20 m, because the object already starts high.","Complementary angles give the same range without air. The 60° shot stays up longer and goes higher, since flight time grows with sinθ.","g is about 6 times smaller on the Moon. Range and flight time both scale as 1/g, so both are about 6 times larger.","Air resistance slows a light object far more than a heavy one, because the same drag force gives a bigger deceleration to a smaller mass (a = F/m)."];
+SIM.coll.ans=["With equal masses and a bouncy hit, the carts swap velocities: cart 1 stops and cart 2 leaves at cart 1’s old speed.","Cart 2 shoots off at nearly twice cart 1’s speed, while cart 1 barely slows down: v₂′ = 2m₁v₁ / (m₁ + m₂).","Momentum is the same before and after, but kinetic energy drops. The missing energy became heat and sound, and the carts move together.","Total momentum is (2×4) + (4×−2) = 0, so with bounciness 0 the carts stop dead after they meet."];
+SIM.pend.ans=["T is proportional to √L, so doubling the length multiplies the period by √2, about 1.41, not 2.","Nothing changes. The mass cancels out of the equation of motion, so the period doesn’t depend on it.","At 80° the measured period is about 15% longer than 2π√(L/g), because the small-angle formula assumes a tiny swing.","Jupiter’s g is about 2.5 times Earth’s, so the period would be about 1.6 times shorter. Making the pendulum about 2.5 times longer restores the same period."];
+SIM.incl.ans=["The block starts to slide when tanθ = μ, so the critical angle is arctan(μ).","No. The mass cancels in a = g(sinθ − μ·cosθ), so every mass accelerates the same.","With μ = 0 the acceleration is exactly g·sinθ.","Weight, normal force and friction are all smaller because g is smaller. The sliding angle arctan(μ) stays the same, but the acceleration is smaller."];
+SIM.circ.ans=["The total resistance rises, so the current falls. R1 takes a larger share of the battery voltage (V₁ = I·R₁) and R2 a smaller share.","The smaller resistor carries more current, because each branch has the full battery voltage and I = V/R.","Parallel gives the current extra paths, so the total resistance is smaller than even the smallest resistor.","P = V²/R, so doubling the voltage makes the power four times bigger."];
+SIM.wave.ans=["The wavelength gets shorter. Since λ = v/f, doubling the frequency halves the wavelength.","The wavelength changes. Frequency is set by the source; the medium sets the speed.","The total amplitude doubles. The waves are in step, which is constructive interference.","The pattern repeats at the beat frequency |f₁ − f₂|. For example, 0.5 Hz and 0.6 Hz give a beat every 10 seconds."];
+function btn(){$("#run").textContent=run?"Pause":(cur==="proj"?(SIM.proj.done?"Launch again":SIM.proj.started?"Resume":"Launch"):this_t()?"Resume":"Run")}
+function this_t(){return cur!=="proj"&&SIM[cur].t>0&&!SIM[cur].done}
+function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;Hh=r.height;cv.width=W*d;cv.height=Hh*d;c.setTransform(d,0,0,d,0,0);gfit()}
+function build(){const s=SIM[cur];$("#ctl").innerHTML=s.ctl.map(o=>o.show&&!P[o.show]?"":o.t==="r"?`<label class="sl"><span>${o.l}</span><span class="num"><input type="number" data-k="${o.k}" min="${o.min}" max="${o.max}" step="${o.step}" value="${P[o.k]}" aria-label="${o.l}">${o.u}</span><input type="range" data-k="${o.k}" min="${o.min}" max="${o.max}" step="${o.step}" value="${P[o.k]}"></label>`:
+ o.t==="s"?`<label class="row"><span>${o.l}</span><select data-k="${o.k}">${Object.keys(G).map(n=>`<option ${P[o.k]===n?"selected":""}>${n}</option>`).join("")}</select></label>`:
+ `<label class="row"><span>${o.l}</span><input type="checkbox" data-k="${o.k}" ${P[o.k]?"checked":""}></label>`).join("")}
+function info(){const s=SIM[cur];$("#pname").textContent=s.name;$("#eq").innerHTML=s.eq;$("#note").textContent=s.note;$("#ans").innerHTML=(s.ans||[]).map(t=>`<li>${t}</li>`).join("");$("#pq").textContent=s.pred[0];$("#pg").value="";$("#pres").innerHTML="";$("#tries").innerHTML=s.tries.map(t=>`<li>${t}</li>`).join("");table()}
+function table(){const r=rows[cur];$("#tbl").innerHTML=r.length?"<tr><th>#</th>"+Object.keys(r[0]).map(k=>`<th>${k}</th>`).join("")+"</tr>"+r.map((x,i)=>`<tr><td>${i+1}</td>`+Object.values(x).map(v=>`<td>${v}</td>`).join("")+"</tr>").join(""):'<tr><td class="empty" style="border:0;text-align:left;white-space:normal">Set up an experiment, then press “Record this setup” to add a row. Copy the table as CSV to paste into a spreadsheet or lab report.</td></tr>'}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),1800)}
+function wh(){try{history.replaceState(null,"","#"+cur+"?"+new URLSearchParams(P))}catch(e){}}
+function pick(k){cur=k;P=PS[k];run=false;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.k===k));SIM[k].ini();build();info();btn();gcv.style.display=SIM[k].graph?"block":"none";fit();wh()}
+const PS={};Object.keys(SIM).forEach(k=>PS[k]={...SIM[k].d});
+$("#tabs").innerHTML=Object.keys(SIM).map(k=>`<button class="tab" data-k="${k}">${SIM[k].name}</button>`).join("");
+$("#tabs").onclick=e=>e.target.dataset.k&&pick(e.target.dataset.k);
+$("#ctl").oninput=e=>{const t=e.target,k=t.dataset.k;if(!k)return;const o=SIM[cur].ctl.find(x=>x.k===k);
+ if(t.type==="number"){let v=+t.value;if(t.value===""||isNaN(v))return;v=Math.min(o.max,Math.max(o.min,v));P[k]=v;t.closest(".sl").querySelector("[type=range]").value=v}
+ else{P[k]=t.type==="checkbox"?t.checked:t.type==="range"?+t.value:t.value;if(t.type==="range")t.closest(".sl").querySelector("[type=number]").value=P[k]}
+ SIM[cur].reset();run=false;btn();$("#pres").innerHTML="";if(t.type==="checkbox")build();wh()};
+$("#ctl").onchange=e=>{if(e.target.type==="number")e.target.value=P[e.target.dataset.k]};
+$("#run").onclick=()=>{const s=SIM[cur];if(!run){if(s.restart&&(s.done||!s.started))s.restart();run=true}else run=false;btn()};
+$("#share").onclick=()=>{(navigator.clipboard?navigator.clipboard.writeText(location.href):Promise.reject()).then(()=>toast("Link copied: it reopens this exact setup")).catch(()=>toast("Copy isn’t available in this browser"))};
+$("#rst").onclick=()=>{SIM[cur].reset();run=false;btn()};$("#spd").onchange=e=>sp=+e.target.value;
+$("#rec").onclick=()=>{if(rows[cur].length>=15)rows[cur].shift();rows[cur].push(SIM[cur].rec());table();toast("Row added to your notebook")};
+$("#pchk").onclick=()=>{const p=SIM[cur].pred,g=parseFloat($("#pg").value);if(isNaN(g))return toast("Type your prediction first");const a=p[1].call(SIM[cur]),rel=Math.abs(a)>1e-9?Math.abs(g-a)/Math.abs(a)*100:Math.abs(g)*100;
+ $("#pres").innerHTML=`<b>${rel<=5?"Excellent":rel<=15?"Close":"Not quite"}.</b> You predicted ${f(g)}. The simulation gives ${f(a)}. You were off by ${f(rel,1)}%.`};
+$("#prn").onclick=()=>window.print();
+$("#clr").onclick=()=>{rows[cur]=[];table()};
+$("#csv").onclick=()=>{const r=rows[cur];if(!r.length)return toast("Record a setup first");const t=[Object.keys(r[0]).join(","),...r.map(x=>Object.values(x).join(","))].join("\n");
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("CSV copied")).catch(()=>toast("Copy isn’t available in this browser"))};
+document.onkeydown=e=>{if(e.code==="Space"&&!/INPUT|SELECT|BUTTON/.test(e.target.tagName)){e.preventDefault();$("#run").click()}};
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(run)SIM[cur].step(dt*sp);SIM[cur].draw();if(SIM[cur].graph){gx.fillStyle=BG;gx.fillRect(0,0,GW,GH);SIM[cur].graph()}
+ if(ts-ro>90){ro=ts;$("#out").innerHTML=SIM[cur].out().map(([a,b])=>`<div><dt>${a}</dt><dd>${b}</dd></div>`).join("")}requestAnimationFrame(loop);try{if(!hadHash&&!localStorage.getItem("pl_seen")){localStorage.setItem("pl_seen","1");$("#dg").showModal()}}catch(e){}}
+function colors(d){INK=d?"#E5E7EB":"#1F2937";BLUE=d?"#60A5FA":"#2563EB";RED=d?"#F87171":"#DC2626";GRN=d?"#4ADE80":"#16A34A";GRID=d?"#24314D":"#E5E7EB";BG=d?"#111A2E":"#FFFFFF";GND=d?"#18233D":"#EEF2F6";MUTE=d?"#94A3B8":"#6B7280"}
+let dark=false;try{const s=localStorage.getItem("pl_theme");dark=s?s==="dark":matchMedia("(prefers-color-scheme:dark)").matches}catch(e){}
+function theme(){colors(dark);document.documentElement.dataset.theme=dark?"dark":"light";$("#theme").textContent=dark?"Light mode":"Dark mode";$("meta[name=theme-color]").content=dark?"#0B1220":"#2563EB"}
+$("#theme").onclick=()=>{dark=!dark;try{localStorage.setItem("pl_theme",dark?"dark":"light")}catch(e){}theme()};
+$("#guide").onclick=()=>$("#dg").showModal();$("#dgx").onclick=()=>$("#dg").close();
+theme();new ResizeObserver(fit).observe(cv);const hadHash=!!location.hash,[ht,hq]=location.hash.slice(1).split("?");if(SIM[ht]){new URLSearchParams(hq||"").forEach((v,k)=>{if(k in SIM[ht].d){const dv=SIM[ht].d[k];PS[ht][k]=typeof dv==="boolean"?v==="true":typeof dv==="number"?(+v||dv):v}})}
+pick(SIM[ht]?ht:"proj");requestAnimationFrame(loop);
+</script>
+</body>
+</html>
